@@ -30,3 +30,4 @@ class SelectorAPI(object):
 	    return vm, dest
         except:
             print "exception occur"
+	    return None, None

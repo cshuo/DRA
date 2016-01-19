@@ -43,11 +43,15 @@ class SelectorManager(object):
             query = base_q.replace('instance_id', itnce)
             cpu_avg[itnce] = mtc.getMeterStatistics("cpu_util", query)['avg']
 
-        vm = max(cpu_avg, key=cpu_avg.get)
+	if cpu_avg:
+            vm = max(cpu_avg, key=cpu_avg.get)
+        else:
+            vm = None
 
         # select a host randomly
         hosts = nova.getComputeHosts()
         hosts.remove(host)
+	print hosts
         dest = random.choice(hosts)
 	print "select {0} on host {1} to migrate to {2}".format(vm, host, dest)
 
@@ -66,3 +70,8 @@ def start_selector():
 
 if __name__ == '__main__':
     start_selector()
+    '''
+    test_m = SelectorManager()
+    vm, dest= test_m.select({}, 'compute1')
+    '''
+
