@@ -22,7 +22,7 @@ class ControllerManager(object):
     def migrate(self, ctxt, vm, dest):
         """ live migrate a vm to dest """
 	print "migrate {0} to {1}".format(vm, dest)
-        Nova.liveMigration(vm, dest)
+        Nova().liveMigrate(vm, dest)
 
 def start_controller():
     transport = messaging.get_transport(cfg.CONF)

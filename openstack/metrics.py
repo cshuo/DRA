@@ -56,7 +56,7 @@ class Metric(OpenstackService):
 
         url = url + "?" + params
 
-        result = self.restful.getResult(url)
+        result = self.restful.get_req(url)
         return result[0]
 
 

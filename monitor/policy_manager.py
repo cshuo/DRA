@@ -6,7 +6,7 @@ from selector.rpcapi import SelectorAPI
 
 def trigger_sche():
     # busy host choosed to re schedule
-    busy_host = 'compute1'
+    busy_host = 'compute2'
 
     select_api = SelectorAPI()
     controller_api = ControllerAPI()

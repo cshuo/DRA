@@ -9,9 +9,32 @@ from openstack import conf
 class Nova(OpenstackService):
 
     def __init__(self):
-
         OpenstackService.__init__(self)
         self.restful = OpenstackRestful(self.tokenId)
+
+
+    def liveMigrate(self, instance_id, host):
+        url = "{base}/v2/{tenant}/servers/{instance}/action".format(base=conf.NOVA_URL,
+		tenant=self.tenantId, instance=instance_id)
+        values = {"os-migrateLive":{"block_migration": "true", "host":host, 'disk_over_commit':"false"}}
+        self.restful.post_req(url, values)
+
+    def evacuteServer(self, src, dest):
+        url = "{base}/v2/{tenant}/servers/{instance}/action".format(base=conf.NOVA_URL,
+		tenant=self.tenantId, instance=instance_id)
+	
+
+    def stopInstance(self, instance_id):
+        url = "{base}/v2/{tenant}/servers/{instance}/action".format(base=conf.NOVA_URL,
+		tenant=self.tenantId, instance=instance_id)
+	values = {"os-stop": 'null'}
+	self.restful.post_req(url, values)
+     
+    def startInstance(self, instance_id):
+        url = "{base}/v2/{tenant}/servers/{instance}/action".format(base=conf.NOVA_URL,
+		tenant=self.tenantId, instance=instance_id)
+	values = {"os-start": 'null'}
+	self.restful.post_req(url, values)
 
     def getInstances(self):
 	""" get all instances belong to a tenant """
@@ -29,7 +52,7 @@ class Nova(OpenstackService):
     def getInstancesOnHost(self, host):
         url = "%s/v2/%s/servers?host=%s" % (conf.NOVA_URL, self.tenantId, host)
 
-        result = self.restful.getResult(url)
+        result = self.restful.get_req(url)
         servers = result['servers']
 
         instances = []
@@ -54,17 +77,6 @@ class Nova(OpenstackService):
 
 
     @staticmethod
-    def liveMigration(instanceId, hostName):
-        ssh_controller = SshTool(conf.CONTROLLER_HOST, 22,
-                                  conf.HOST_ROOT_USERNAME,
-                                  conf.HOST_ROOT_PASSWORD)
-
-        cmd_migrate = "nova %s live-migration --block-migrate %s %s" \
-		      % (conf.PARAMS, instanceId, hostName)
-        ssh_controller.remote_cmd(cmd_migrate)
-        ssh_controller.close()
-
-    @staticmethod
     def liveMigrateAll(src_host, dest_host):
         ssh_controller = SshTool(conf.CONTROLLER_HOST, 22,
                                   conf.HOST_ROOT_USERNAME,
@@ -79,16 +91,7 @@ class Nova(OpenstackService):
 if __name__ == "__main__":
     nova = Nova()
     #instances = nova.getInstances()
-    #for instance in instances:
-    #    print instance.getId()
+    #print nova.getInstancesOnHost('compute1')[0]
+    #nova.liveMigrate('8387a836-1a28-4061-8c25-e5a57ff170e8', 'compute1')
+    nova.startInstance('8387a836-1a28-4061-8c25-e5a57ff170e8')
 
-    #nova.liveMigration('8387a836-1a28-4061-8c25-e5a57ff170e8', "compute2")
-
-
-    ##host = Host("compute1", conf.COMPUTE1_HOST)
-    #
-    ##Nova.liveMigration(instances[0], host)
-    #hosts = nova.getHosts()
-    #for host in hosts:
-    #    print host.getHostName()
-    print nova.getInstancesOnHost('compute2')[0]
