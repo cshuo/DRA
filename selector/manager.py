@@ -4,15 +4,8 @@ import random
 
 from openstack.nova import Nova
 from openstack.metrics import Metric
+from openstack.config import *
 
-
-CONF = cfg.CONF
-rpcapi_opt = [
-    cfg.StrOpt('selector_topic',
-               default='selector_topic',
-               help='the topic that selector_topic service listen on')
-]
-CONF.register_opts(rpcapi_opt)
 
 class SelectorManager(object):
     """ endpoints methods provided by controller service """

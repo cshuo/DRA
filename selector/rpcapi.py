@@ -1,13 +1,7 @@
 from oslo_config import cfg
 import oslo_messaging as messaging
 
-CONF = cfg.CONF
-rpcapi_opt = [
-    cfg.StrOpt('selector_topic',
-               default='selector_topic',
-               help='the topic that selector_topic service listen on')
-]
-CONF.register_opts(rpcapi_opt)
+from openstack.config import *
 
 
 class SelectorAPI(object):
@@ -27,3 +21,6 @@ class SelectorAPI(object):
         except:
             print "exception occur"
 	    return None, None
+
+if __name__ == '__main__':
+    print CONF.selector_topic

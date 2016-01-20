@@ -3,14 +3,8 @@ import oslo_messaging as messaging
 import logging
 
 from openstack.nova import Nova
+from openstack.config import *
 
-CONF = cfg.CONF
-rpcapi_opt = [
-    cfg.StrOpt('controller_topic',
-               default='controller_topic',
-               help='the topic that controller service listen on')
-]
-CONF.register_opts(rpcapi_opt)
 
 LOG = logging.getLogger(__name__)
 
