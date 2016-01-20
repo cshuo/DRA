@@ -63,18 +63,51 @@ class Nova(OpenstackService):
 
 
     def getComputeHosts(self):
+	""" get all compute hosts of openstack """ 
         url = "%s/v2/%s/os-hosts" % (conf.NOVA_URL, self.tenantId)
 
-        result = self.restful.getResult(url)
+        result = self.restful.get_req(url)
 
         hostsList = result['hosts']
         hosts = []
         for host in hostsList:
             if host['service'] == 'compute':
                 hosts.append(host['host_name'])
-
         return hosts
 
+    def hostDetail(self, host):
+	""" show details for a host"""
+        url = "{base}/v2/{tenant}/os-hosts/{host}".format(
+		base=conf.NOVA_URL,tenant=self.tenantId, host=host)
+	info = self.restful.get_req(url)
+	print info
+
+    def _hypervisorList(self):
+        url = "{base}/v2/{tenant}/os-hypervisors".format(base=conf.NOVA_URL,
+							  tenant=self.tenantId)
+	info = self.restful.get_req(url)
+	hypervisor = {}
+	hvsors = info['hypervisors']
+	for hvsor in hvsors:
+	    hypervisor[hvsor['hypervisor_hostname']] = hvsor['id']
+	return hypervisor
+	
+    def hypervisorDetail(self, host):
+	hypervisors = self._hypervisorList()
+	host_id = hypervisors[host]
+        url = "{base}/v2/{tenant}/os-hypervisors/{hostid}".format(base=conf.NOVA_URL,
+							      tenant=self.tenantId,
+							      hostid=host_id)
+	info = self.restful.get_req(url)['hypervisor']
+	sttcs = dict()
+	sttcs['vcpus'] = info['vcpus']
+	sttcs['vpcus_used'] = info['vcpus_used']
+	sttcs['mem_total'] = info['memory_mb']
+	sttcs['mem_used'] = info['memory_mb_used']
+	sttcs['workload'] = info['current_workload']
+
+	return sttcs
+	
 
     @staticmethod
     def liveMigrateAll(src_host, dest_host):
@@ -92,6 +125,8 @@ if __name__ == "__main__":
     nova = Nova()
     #instances = nova.getInstances()
     #print nova.getInstancesOnHost('compute1')[0]
-    #nova.liveMigrate('8387a836-1a28-4061-8c25-e5a57ff170e8', 'compute1')
-    nova.startInstance('8387a836-1a28-4061-8c25-e5a57ff170e8')
-
+    #nova.liveMigrate('c3f12b05-d9ed-4691-a41e-4de8def65d58', 'compute1')
+    #nova.startInstance('8387a836-1a28-4061-8c25-e5a57ff170e8')
+    #print nova.getComputeHosts()
+    print nova.hypervisorDetail('compute1')
+    print nova.hypervisorDetail('compute2')

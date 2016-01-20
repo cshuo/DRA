@@ -1,28 +1,33 @@
 from oslo_config import cfg
 import oslo_messaging as messaging
+import time
 
 from controller.rpcapi import ControllerAPI
 from selector.rpcapi import SelectorAPI
+from openstack.nova import Nova
 
-def trigger_sche():
+def trigger_sche(host):
     # busy host choosed to re schedule
-    busy_host = 'compute2'
-
     select_api = SelectorAPI()
     controller_api = ControllerAPI()
     # selected vm to migrate to dest
-    vm, dest = select_api.select(busy_host)
+    vm, dest = select_api.select(host)
     if vm:
     	controller_api.migrate(vm, dest)
+	time.sleep(120)
 
-def test_sel():
-    transport = messaging.get_transport(cfg.CONF)
-    target = messaging.Target(topic='selector')
-    client = messaging.RPCClient(transport, target)
-    
-    vm, dest = client.call(ctxt={}, method='select', host='compute1')
-    print vm, dest
-
+def monitor():
+    # monitor host status to decide whether resource reallocation
+    nova = Nova()
+    while 1:
+    	hosts = nova.getComputeHosts()
+        for h in hosts:
+	    sttcs = nova.hypervisorDetail(h)
+	    if float(sttcs['mem_used']) / sttcs['mem_total'] > 0.3:
+		print "mem util ", sttcs['mem_used'], "busy host", h, ",migrate vm from ", h
+	        trigger_sche(h)
+	time.sleep(10)
 
 if __name__ == '__main__':
-    trigger_sche()
+    print "monitoring service start..."
+    monitor()

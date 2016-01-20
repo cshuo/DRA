@@ -7,16 +7,6 @@ from openstack.nova import Nova
 from openstack.metrics import Metric
 
 
-'''
-CONF = cfg.CONF
-rpcapi_opt = [
-    cfg.StrOpt('selector_topic',
-               default='selector_topic',
-               help='the topic that select service listen on')
-]
-CONF.register_opts(rpcapi_opt)
-'''
-
 LOG = logging.getLogger(__name__)
 
 class SelectorManager(object):
@@ -28,10 +18,10 @@ class SelectorManager(object):
 
         base_q = '''[{"field": "timestamp",
             "op": "ge",
-            "value": "2016-01-17T12:00:00"},
+            "value": "2016-01-20T04:30:00"},
             {"field": "timestamp",
             "op": "lt",
-            "value": "2016-01-17T13:00:00"},
+            "value": "2016-01-20T05:00:00"},
             {"field": "resource_id",
             "op": "eq",
             "value": "instance_id"}]'''
@@ -43,15 +33,15 @@ class SelectorManager(object):
             query = base_q.replace('instance_id', itnce)
             cpu_avg[itnce] = mtc.getMeterStatistics("cpu_util", query)['avg']
 
+	# NOTE change NOTE select most work heavy vm to migrate
 	if cpu_avg:
             vm = max(cpu_avg, key=cpu_avg.get)
         else:
             vm = None
 
-        # select a host randomly
+        # NOTE change NOTE select a host randomly
         hosts = nova.getComputeHosts()
         hosts.remove(host)
-	print hosts
         dest = random.choice(hosts)
 	print "select {0} on host {1} to migrate to {2}".format(vm, host, dest)
 
@@ -70,8 +60,6 @@ def start_selector():
 
 if __name__ == '__main__':
     start_selector()
-    '''
-    test_m = SelectorManager()
-    vm, dest= test_m.select({}, 'compute1')
-    '''
+    #test_m = SelectorManager()
+    #vm, dest= test_m.select({}, 'compute1')
 

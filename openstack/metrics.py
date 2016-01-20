@@ -66,12 +66,12 @@ if __name__=="__main__":
 
     q = '''[{"field": "timestamp",
     "op": "ge",
-    "value": "2016-01-17T12:00:00"},
+    "value": "2016-01-20T04:30:00"},
     {"field": "timestamp",
     "op": "lt",
-    "value": "2016-01-17T13:00:00"},
+    "value": "2016-01-20T05:00:00"},
     {"field": "resource_id",
     "op": "eq",
-    "value": "8387a836-1a28-4061-8c25-e5a57ff170e8"}]'''
+    "value": "c3f12b05-d9ed-4691-a41e-4de8def65d58"}]'''
 
-    print ceilometerTest.getMeterStatistics("cpu_util", q)
+    print ceilometerTest.getMeterStatistics("cpu_util", q)['avg']
