@@ -4,7 +4,6 @@ import logging
 
 from openstack.nova import Nova
 
-'''
 CONF = cfg.CONF
 rpcapi_opt = [
     cfg.StrOpt('controller_topic',
@@ -12,7 +11,6 @@ rpcapi_opt = [
                help='the topic that controller service listen on')
 ]
 CONF.register_opts(rpcapi_opt)
-'''
 
 LOG = logging.getLogger(__name__)
 
@@ -26,7 +24,7 @@ class ControllerManager(object):
 
 def start_controller():
     transport = messaging.get_transport(cfg.CONF)
-    target = messaging.Target(topic='controller', server='cshuo')
+    target = messaging.Target(topic=CONF.controller_topic, server='cshuo')
     endpoints = [
         ControllerManager(),
     ]

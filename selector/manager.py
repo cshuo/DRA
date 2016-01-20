@@ -1,13 +1,18 @@
 from oslo_config import cfg
 import oslo_messaging as messaging
-import logging
 import random
 
 from openstack.nova import Nova
 from openstack.metrics import Metric
 
 
-LOG = logging.getLogger(__name__)
+CONF = cfg.CONF
+rpcapi_opt = [
+    cfg.StrOpt('selector_topic',
+               default='selector_topic',
+               help='the topic that selector_topic service listen on')
+]
+CONF.register_opts(rpcapi_opt)
 
 class SelectorManager(object):
     """ endpoints methods provided by controller service """
@@ -49,7 +54,7 @@ class SelectorManager(object):
 
 def start_selector():
     transport = messaging.get_transport(cfg.CONF)
-    target = messaging.Target(topic='selector', server='cs')
+    target = messaging.Target(topic=CONF.selector_topic, server='cs')
     endpoints = [
         SelectorManager(),
     ]

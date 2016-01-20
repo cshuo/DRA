@@ -1,8 +1,6 @@
 from oslo_config import cfg
 import oslo_messaging as messaging
-import logging
 
-'''
 CONF = cfg.CONF
 rpcapi_opt = [
     cfg.StrOpt('selector_topic',
@@ -10,14 +8,12 @@ rpcapi_opt = [
                help='the topic that selector_topic service listen on')
 ]
 CONF.register_opts(rpcapi_opt)
-'''
 
-LOG = logging.getLogger(__name__)
 
 class SelectorAPI(object):
     def __init__(self):
         self.transport = messaging.get_transport(cfg.CONF)
-        self.target = messaging.Target(topic='selector')
+        self.target = messaging.Target(topic=CONF.selector_topic)
         self._client = messaging.RPCClient(self.transport, self.target)
 
     def select(self, host):
