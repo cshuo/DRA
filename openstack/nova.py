@@ -14,27 +14,28 @@ class Nova(OpenstackService):
 
 
     def liveMigrate(self, instance_id, host):
+	""" live migrate an instance to dest host """
         url = "{base}/v2/{tenant}/servers/{instance}/action".format(base=conf.NOVA_URL,
 		tenant=self.tenantId, instance=instance_id)
         values = {"os-migrateLive":{"block_migration": "true", "host":host, 'disk_over_commit':"false"}}
         self.restful.post_req(url, values)
 
-    def evacuteServer(self, src, dest):
-        url = "{base}/v2/{tenant}/servers/{instance}/action".format(base=conf.NOVA_URL,
-		tenant=self.tenantId, instance=instance_id)
-	
 
     def stopInstance(self, instance_id):
+	""" stop a specific instance """
         url = "{base}/v2/{tenant}/servers/{instance}/action".format(base=conf.NOVA_URL,
 		tenant=self.tenantId, instance=instance_id)
 	values = {"os-stop": 'null'}
 	self.restful.post_req(url, values)
      
+
     def startInstance(self, instance_id):
+	""" start a specific instance """
         url = "{base}/v2/{tenant}/servers/{instance}/action".format(base=conf.NOVA_URL,
 		tenant=self.tenantId, instance=instance_id)
 	values = {"os-start": 'null'}
 	self.restful.post_req(url, values)
+
 
     def getInstances(self):
 	""" get all instances belong to a tenant """
@@ -49,7 +50,9 @@ class Nova(OpenstackService):
 
         return instances
 
+
     def getInstancesOnHost(self, host):
+	""" get all instances on specific host """
         url = "%s/v2/%s/servers?host=%s" % (conf.NOVA_URL, self.tenantId, host)
 
         result = self.restful.get_req(url)
@@ -76,13 +79,15 @@ class Nova(OpenstackService):
         return hosts
 
     def hostDetail(self, host):
-	""" show details for a host"""
+	""" show details for a host """
         url = "{base}/v2/{tenant}/os-hosts/{host}".format(
 		base=conf.NOVA_URL,tenant=self.tenantId, host=host)
 	info = self.restful.get_req(url)
 	print info
 
+
     def _hypervisorList(self):
+	""" get all hypervisors, return name,id pair """
         url = "{base}/v2/{tenant}/os-hypervisors".format(base=conf.NOVA_URL,
 							  tenant=self.tenantId)
 	info = self.restful.get_req(url)
@@ -92,7 +97,9 @@ class Nova(OpenstackService):
 	    hypervisor[hvsor['hypervisor_hostname']] = hvsor['id']
 	return hypervisor
 	
+
     def hypervisorDetail(self, host):
+	""" get detail info for a specific hypervisor """
 	hypervisors = self._hypervisorList()
 	host_id = hypervisors[host]
         url = "{base}/v2/{tenant}/os-hypervisors/{hostid}".format(base=conf.NOVA_URL,
@@ -111,6 +118,7 @@ class Nova(OpenstackService):
 
     @staticmethod
     def liveMigrateAll(src_host, dest_host):
+	""" live migrate all instances on src host to dest """
         ssh_controller = SshTool(conf.CONTROLLER_HOST, 22,
                                   conf.HOST_ROOT_USERNAME,
                                   conf.HOST_ROOT_PASSWORD)

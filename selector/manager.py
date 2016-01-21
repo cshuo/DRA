@@ -4,8 +4,9 @@ import random
 
 from openstack.nova import Nova
 from openstack.metrics import Metric
-from openstack.config import *
+from openstack import config
 
+CONF = cfg.CONF
 
 class SelectorManager(object):
     """ endpoints methods provided by controller service """
@@ -57,7 +58,10 @@ def start_selector():
     server.wait()
 
 if __name__ == '__main__':
-    start_selector()
+    try:
+    	start_selector()
+    except KeyboardInterrupt:
+	print "\nselector service exiting..."
     #test_m = SelectorManager()
     #vm, dest= test_m.select({}, 'compute1')
 

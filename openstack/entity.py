@@ -1,7 +1,7 @@
-"""
-openstack entity, including instances and compute hosts
-"""
 class Host(object):
+    """
+    openstack entity, including instances and compute hosts
+    """
     def __init__(self, hostName):
         self.hostName = hostName
 

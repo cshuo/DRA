@@ -1,10 +1,14 @@
 from oslo_config import cfg
 import oslo_messaging as messaging
 
-from openstack.config import *
+from openstack import config
 
+CONF = cfg.CONF
 
 class SelectorAPI(object):
+    """
+    client side for selector rpc api
+    """
     def __init__(self):
         self.transport = messaging.get_transport(cfg.CONF)
         self.target = messaging.Target(topic=CONF.selector_topic)

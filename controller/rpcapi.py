@@ -2,11 +2,15 @@ from oslo_config import cfg
 import oslo_messaging as messaging
 import logging
 
-from openstack.config import *
+from openstack import config
 
+CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
 
 class ControllerAPI(object):
+    """
+    client side for controller rpc api
+    """
     def __init__(self):
         self.transport = messaging.get_transport(cfg.CONF)
         self.target = messaging.Target(topic=CONF.controller_topic)

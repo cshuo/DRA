@@ -1,29 +1,19 @@
-import urllib2
-import urllib
-import json
+import requests
 
 class Authentication:
     def __init__(self):
         self.tokenId=None
         self.tenantId=None
 
-    def tokenGet(self, host, tenant, user, password):
-        '''
-        get authentication token from keystone
-        '''
+    def tokenGet(self, host, tenant, user, passwd):
+	url = "{0}/v2.0/tokens".format(host)
+	headers = {"Content-type":"application/json"}
+	data = {'auth': {'tenantName': tenant,
+			 'passwordCredentials': {'username': user, 'password':passwd}}}
+	info = requests.post(url, json=data, headers=headers).json()
 
-        url = "%s/v2.0/tokens" % host
-        tokenRequest = urllib2.Request(url)
-        tokenRequest.add_header("Content-type", "application/json")
-
-        data = json.dumps({'auth': {'tenantName': tenant, 'passwordCredentials': {'username': user, 'password': password}}})
-        request = urllib2.urlopen(tokenRequest, data)
-
-        result=json.loads(request.read())
-        request.close()
-
-        self.tokenId=result["access"]["token"]["id"]
-        self.tenantId=result["access"]["token"]["tenant"]["id"]
+        self.tokenId = info["access"]["token"]["id"]
+        self.tenantId = info["access"]["token"]["tenant"]["id"]
 
     def getTokenId(self):
         return self.tokenId

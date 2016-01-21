@@ -3,9 +3,10 @@ import oslo_messaging as messaging
 import logging
 
 from openstack.nova import Nova
-from openstack.config import *
+from openstack import config
 
 
+CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
 
 class ControllerManager(object):
@@ -28,4 +29,7 @@ def start_controller():
     server.wait()
 
 if __name__ == '__main__':
-    start_controller()
+    try:
+    	start_controller()
+    except KeyboardInterrupt:
+	print "\ncontroller service exiting..."

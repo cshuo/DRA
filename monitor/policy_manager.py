@@ -7,6 +7,7 @@ from selector.rpcapi import SelectorAPI
 from openstack.nova import Nova
 
 def trigger_sche(host):
+    """ trigger controller to conduct migrate operation """
     # busy host choosed to re schedule
     select_api = SelectorAPI()
     controller_api = ControllerAPI()
@@ -17,17 +18,20 @@ def trigger_sche(host):
 	time.sleep(120)
 
 def monitor():
-    # monitor host status to decide whether resource reallocation
+    """ monitor host status to decide whether resource reallocation """
     nova = Nova()
     while 1:
     	hosts = nova.getComputeHosts()
         for h in hosts:
 	    sttcs = nova.hypervisorDetail(h)
 	    if float(sttcs['mem_used']) / sttcs['mem_total'] > 0.3:
-		print "mem util ", sttcs['mem_used'], "busy host", h, ",migrate vm from ", h
+		print "host busy", ",migrate vm from ", h
 	        trigger_sche(h)
 	time.sleep(10)
 
 if __name__ == '__main__':
     print "monitoring service start..."
-    monitor()
+    try:
+        monitor()
+    except KeyboardInterrupt:
+	print "\nexiting..."
